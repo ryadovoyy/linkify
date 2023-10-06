@@ -1,10 +1,12 @@
-FROM gradle:8.3-jdk17-alpine AS build
+FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /source
-COPY build.gradle .
+COPY gradlew .
+COPY gradle gradle/
 COPY settings.gradle .
+COPY build.gradle .
 COPY src src/
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle --build-cache --parallel --no-daemon bootJar
+    ./gradlew --build-cache --parallel --no-daemon bootJar
 
 FROM eclipse-temurin:17-jre-alpine
 USER guest

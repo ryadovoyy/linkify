@@ -1,9 +1,6 @@
 package com.ryadovoy.linkify.security;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,11 +63,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        var jwk = new OctetSequenceKey.Builder(secretKey())
-                .algorithm(JWSAlgorithm.HS256)
-                .build();
-
-        var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
+        var jwkSource = new ImmutableSecret<>(secretKey());
+        return new NimbusJwtEncoder(jwkSource);
     }
 }

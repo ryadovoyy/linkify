@@ -14,6 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JWT_SECRET_KEY=XbGD1T2HrTLncAAnhsTlJ+0WvodFnGmALB7Qcr8PlTI=
 
   postgres:
     container_name: postgres

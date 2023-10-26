@@ -7,3 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}

@@ -1,6 +1,8 @@
 package com.ryadovoy.linkify.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public SecretKey secretKey() {
-        var keyBytes = Base64.getDecoder().decode(key);
+        byte[] keyBytes = Base64.getDecoder().decode(key);
         return new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
@@ -63,7 +65,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        var jwkSource = new ImmutableSecret<>(secretKey());
+        JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(secretKey());
         return new NimbusJwtEncoder(jwkSource);
     }
 }

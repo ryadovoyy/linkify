@@ -15,7 +15,14 @@ import lombok.ToString;
 public class AppUser {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "app_user_seq"
+    )
+    @SequenceGenerator(
+            name = "app_user_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "email", nullable = false, unique = true)

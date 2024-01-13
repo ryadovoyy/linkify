@@ -20,7 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Size(min = 12, max = 64, message = "Password length must be between 12 and 64 characters")
 @Pattern(
         regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).*$",
-        message = "Password must include at least one uppercase letter, one lowercase letter, and one digit")
+        message = "Password must include at least one uppercase letter, one lowercase letter, and one digit"
+)
 public @interface RegistrationPassword {
     String message() default "{com.ryadovoy.linkify.validation.annotation.RegistrationPassword.message}";
     Class<?>[] groups() default {};

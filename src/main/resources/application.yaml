@@ -5,8 +5,12 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: ${SPRING_JPA_PROPERTIES_HIBERNATE_HBM2DDL_AUTO}
+        generate_statistics: ${SPRING_JPA_PROPERTIES_HIBERNATE_GENERATE_STATISTICS}
+        log_slow_query: 10
 
 jwt:
   secret:

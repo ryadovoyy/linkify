@@ -13,8 +13,10 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/linkify
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_HBM2DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_GENERATE_STATISTICS=true
       - JWT_SECRET_KEY=XbGD1T2HrTLncAAnhsTlJ+0WvodFnGmALB7Qcr8PlTI=
+      - LOG_CONFIG=dev
 
   postgres:
     container_name: postgres

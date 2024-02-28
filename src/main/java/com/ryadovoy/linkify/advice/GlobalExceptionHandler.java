@@ -1,11 +1,14 @@
 package com.ryadovoy.linkify.advice;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ryadovoy.linkify.exception.AuthenticationException;
+import com.ryadovoy.linkify.exception.PageArgumentNotValidException;
+import com.ryadovoy.linkify.exception.RoleNotFoundException;
 import com.ryadovoy.linkify.exception.UserAlreadyExistsException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,11 +18,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private static final String VALIDATION_ERROR_MESSAGE = "Validation errors occurred";
+    private static final String REGISTRATION_ERROR_MESSAGE = "Registration failed";
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "There is a server problem, try again later";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse<Violation>> handleValidationException(
+    public ResponseEntity<ErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex, WebRequest request) {
+        log.info(ex.getMessage());
         List<Violation> violations = new ArrayList<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
@@ -28,32 +37,54 @@ public class GlobalExceptionHandler {
         });
 
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        String message = "Validation errors occurred";
-        ErrorResponse<Violation> response = new ErrorResponse<>(httpStatus, message, request, violations);
+        ErrorResponse response = new ErrorResponse(httpStatus, VALIDATION_ERROR_MESSAGE, request, violations);
 
-        return ResponseEntity.status(httpStatus).body(response);
+        return createResponseEntity(httpStatus, response);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse<?>> handleUserAlreadyExistsException(
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException ex, WebRequest request) {
+        log.info(ex.getMessage());
+        return createSimpleResponse(HttpStatus.BAD_REQUEST, REGISTRATION_ERROR_MESSAGE, request);
+    }
+
+    @ExceptionHandler(PageArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handlePageArgumentNotValidException(
+            PageArgumentNotValidException ex, WebRequest request) {
+        log.info(ex.getMessage());
         return createSimpleResponse(HttpStatus.BAD_REQUEST, ex, request);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse<?>> handleAuthenticationException(
-            AuthenticationException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
         return createSimpleResponse(HttpStatus.UNAUTHORIZED, ex, request);
     }
 
-    private static ResponseEntity<ErrorResponse<?>> createSimpleResponse(
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
+        return createSimpleResponse(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE, request);
+    }
+
+    private static ResponseEntity<ErrorResponse> createSimpleResponse(
             HttpStatus httpStatus, Exception ex, WebRequest request) {
-        ErrorResponse<?> response = new ErrorResponse<>(httpStatus, ex.getMessage(), request);
+        ErrorResponse response = new ErrorResponse(httpStatus, ex.getMessage(), request);
+        return createResponseEntity(httpStatus, response);
+    }
+
+    private static ResponseEntity<ErrorResponse> createSimpleResponse(
+            HttpStatus httpStatus, String message, WebRequest request) {
+        ErrorResponse response = new ErrorResponse(httpStatus, message, request);
+        return createResponseEntity(httpStatus, response);
+    }
+
+    private static ResponseEntity<ErrorResponse> createResponseEntity(HttpStatus httpStatus, ErrorResponse response) {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
     @Getter
-    public static class ErrorResponse<T> {
+    public static class ErrorResponse {
         private final Date timestamp = new Date();
         private final int status;
         private final String error;
@@ -61,7 +92,7 @@ public class GlobalExceptionHandler {
         private final String path;
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private List<T> subErrors;
+        private List<Violation> subErrors;
 
         public ErrorResponse(HttpStatus httpStatus, String message, WebRequest request) {
             this.status = httpStatus.value();
@@ -70,7 +101,7 @@ public class GlobalExceptionHandler {
             this.path = request.getDescription(false).split("=")[1];
         }
 
-        public ErrorResponse(HttpStatus httpStatus, String message, WebRequest request, List<T> subErrors) {
+        public ErrorResponse(HttpStatus httpStatus, String message, WebRequest request, List<Violation> subErrors) {
             this(httpStatus, message, request);
             this.subErrors = subErrors;
         }

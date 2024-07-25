@@ -5,5 +5,47 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: none
+        format_sql: true
+        generate_statistics: ${SPRING_JPA_PROPERTIES_HIBERNATE_GENERATE_STATISTICS}
+        log_slow_query: 10
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: initial-migration
+  jpa:
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: create
+              create-target: src/main/resources/db/migration/create.sql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: update-migration
+  jpa:
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: update
+              create-target: src/main/resources/db/migration/update.sql

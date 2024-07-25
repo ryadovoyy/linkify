@@ -1,0 +1,45 @@
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <if condition='property("LOG_CONFIG").equals("dev")'>
+    <then>
+      <logger name="org.hibernate.SQL" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+
+      <logger name="org.hibernate.orm.jdbc.bind" level="trace" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+
+      <logger name="org.hibernate.stat" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+
+      <logger name="org.hibernate.SQL_SLOW" level="info" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+
+      <logger name="org.hibernate.cache" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+    </then>
+  </if>
+
+  <if condition='property("LOG_CONFIG").equals("prod")'>
+    <then>
+      <logger name="org.hibernate" level="error" additivity="false">
+        <appender-ref ref="STDOUT" />
+      </logger>
+    </then>
+  </if>
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

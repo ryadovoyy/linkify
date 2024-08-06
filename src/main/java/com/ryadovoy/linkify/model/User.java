@@ -17,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
     @Id
-    @Column(name = "id")
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
             generator = "app_user_seq"
@@ -28,10 +27,10 @@ public class User {
     )
     private Long id;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     @ToString.Exclude
     private String password;
 

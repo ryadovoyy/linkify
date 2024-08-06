@@ -3,11 +3,9 @@ package com.ryadovoy.linkify.dto.request;
 import com.ryadovoy.linkify.validation.annotation.AuthEmail;
 import com.ryadovoy.linkify.validation.annotation.AuthPassword;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 public class LoginRequest {
     @AuthEmail
